@@ -22,7 +22,7 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a className="text-primary-foreground/80 hover:text-primary-foreground transition-colors" href="/application-status">
                   Application Status
                 </a>
               </li>
