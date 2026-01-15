@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Search, Eye, CheckCircle, XCircle, Clock, FileText, Download, File, ExternalLink, CreditCard } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { generateAdmitCardPDF } from "@/lib/admitCardPdf";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 type ApplicationRow = Database['public']['Tables']['applications']['Row'];
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -41,7 +42,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
-  
+
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,9 +59,9 @@ const AdminDashboard = () => {
         return;
       }
 
-      const { data: isAdmin } = await supabase.rpc('has_role', { 
-        _user_id: user.id, 
-        _role: 'admin' 
+      const { data: isAdmin } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
       });
 
       if (!isAdmin) {
@@ -140,7 +141,7 @@ const AdminDashboard = () => {
     const { data, error } = await supabase.storage
       .from("documents")
       .createSignedUrl(filePath, 3600); // 1 hour expiry
-    
+
     if (error) {
       toast({
         variant: "destructive",
@@ -189,13 +190,13 @@ const AdminDashboard = () => {
 
   const handleStatusUpdate = async (status: ApplicationStatus) => {
     if (!selectedApp) return;
-    
+
     setIsUpdating(true);
     try {
       const { error } = await supabase
         .from("applications")
-        .update({ 
-          status, 
+        .update({
+          status,
           remarks: remarks || null,
           reviewed_at: new Date().toISOString()
         })
@@ -264,7 +265,7 @@ const AdminDashboard = () => {
 
   const handleDownloadAdmitCard = (app: Application) => {
     if (!app.admit_card) return;
-    
+
     generateAdmitCardPDF({
       admitCardNumber: app.admit_card.admit_card_number,
       applicationNumber: app.application_number,
@@ -333,14 +334,14 @@ Generated on: ${new Date().toLocaleString()}
   };
 
   const filteredApplications = applications.filter(app => {
-    const matchesSearch = 
+    const matchesSearch =
       app.application_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.course_name.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || app.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -364,165 +365,173 @@ Generated on: ${new Date().toLocaleString()}
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage all student applications</p>
+        <ScrollReveal animation="fade-in">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+              <p className="text-muted-foreground">Manage all student applications</p>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-sm text-muted-foreground">Total</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-blue-600">{stats.submitted}</div>
-              <p className="text-sm text-muted-foreground">Submitted</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-yellow-600">{stats.underReview}</div>
-              <p className="text-sm text-muted-foreground">Under Review</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
-              <p className="text-sm text-muted-foreground">Approved</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-              <p className="text-sm text-muted-foreground">Rejected</p>
-            </CardContent>
-          </Card>
-        </div>
+        <ScrollReveal animation="fade-up" delay={200}>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{stats.total}</div>
+                <p className="text-sm text-muted-foreground">Total</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-blue-600">{stats.submitted}</div>
+                <p className="text-sm text-muted-foreground">Submitted</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-yellow-600">{stats.underReview}</div>
+                <p className="text-sm text-muted-foreground">Under Review</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+                <p className="text-sm text-muted-foreground">Approved</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+                <p className="text-sm text-muted-foreground">Rejected</p>
+              </CardContent>
+            </Card>
+          </div>
+        </ScrollReveal>
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, email, application number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+        <ScrollReveal animation="fade-up" delay={300}>
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, email, application number..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="under_review">Under Review</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="submitted">Submitted</SelectItem>
-                  <SelectItem value="under_review">Under Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </ScrollReveal>
 
         {/* Applications Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Applications ({filteredApplications.length})</CardTitle>
-            <CardDescription>Click on an application to review and update status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {filteredApplications.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No applications found</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-3 font-medium">Application #</th>
-                      <th className="text-left p-3 font-medium">Name</th>
-                      <th className="text-left p-3 font-medium">Course</th>
-                      <th className="text-left p-3 font-medium">Submitted</th>
-                      <th className="text-left p-3 font-medium">Status</th>
-                      <th className="text-left p-3 font-medium">Admit Card</th>
-                      <th className="text-left p-3 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredApplications.map((app) => (
-                      <tr key={app.id} className="border-b hover:bg-muted/50">
-                        <td className="p-3 font-mono text-sm">{app.application_number}</td>
-                        <td className="p-3">
-                          <div>{app.profiles?.full_name || 'N/A'}</div>
-                          <div className="text-sm text-muted-foreground">{app.profiles?.email}</div>
-                        </td>
-                        <td className="p-3">{app.course_name}</td>
-                        <td className="p-3 text-sm">
-                          {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '-'}
-                        </td>
-                        <td className="p-3">
-                          <Badge variant={statusConfig[app.status].variant}>
-                            {statusConfig[app.status].label}
-                          </Badge>
-                        </td>
-                        <td className="p-3">
-                          {app.admit_card ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDownloadAdmitCard(app)}
-                              className="text-green-600 border-green-600 hover:bg-green-50"
-                            >
-                              <CreditCard className="h-4 w-4 mr-1" />
-                              {app.admit_card.admit_card_number}
-                            </Button>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedApp(app);
-                                setRemarks(app.remarks || "");
-                                setIsDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Review
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => generatePDF(app)}
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
+        <ScrollReveal animation="fade-up" delay={400}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Applications ({filteredApplications.length})</CardTitle>
+              <CardDescription>Click on an application to review and update status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {filteredApplications.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No applications found</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-3 font-medium">Application #</th>
+                        <th className="text-left p-3 font-medium">Name</th>
+                        <th className="text-left p-3 font-medium">Course</th>
+                        <th className="text-left p-3 font-medium">Submitted</th>
+                        <th className="text-left p-3 font-medium">Status</th>
+                        <th className="text-left p-3 font-medium">Admit Card</th>
+                        <th className="text-left p-3 font-medium">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    </thead>
+                    <tbody>
+                      {filteredApplications.map((app) => (
+                        <tr key={app.id} className="border-b hover:bg-muted/50">
+                          <td className="p-3 font-mono text-sm">{app.application_number}</td>
+                          <td className="p-3">
+                            <div>{app.profiles?.full_name || 'N/A'}</div>
+                            <div className="text-sm text-muted-foreground">{app.profiles?.email}</div>
+                          </td>
+                          <td className="p-3">{app.course_name}</td>
+                          <td className="p-3 text-sm">
+                            {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '-'}
+                          </td>
+                          <td className="p-3">
+                            <Badge variant={statusConfig[app.status].variant}>
+                              {statusConfig[app.status].label}
+                            </Badge>
+                          </td>
+                          <td className="p-3">
+                            {app.admit_card ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadAdmitCard(app)}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
+                                <CreditCard className="h-4 w-4 mr-1" />
+                                {app.admit_card.admit_card_number}
+                              </Button>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedApp(app);
+                                  setRemarks(app.remarks || "");
+                                  setIsDialogOpen(true);
+                                }}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Review
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => generatePDF(app)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </ScrollReveal>
 
         {/* Review Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -533,7 +542,7 @@ Generated on: ${new Date().toLocaleString()}
                 Application #{selectedApp?.application_number}
               </DialogDescription>
             </DialogHeader>
-            
+
             {selectedApp && (
               <div className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">

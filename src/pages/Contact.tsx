@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
@@ -69,15 +70,15 @@ const Contact = () => {
     }
 
     setIsLoading(true);
-    
+
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     toast({
       title: "Message Sent!",
       description: "Thank you for contacting us. We'll get back to you soon.",
     });
-    
+
     setFormData({ name: "", email: "", subject: "", message: "" });
     setIsLoading(false);
   };
@@ -88,12 +89,14 @@ const Contact = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-            <p className="text-lg opacity-90 max-w-2xl mx-auto">
-              Have questions? We're here to help. Reach out to us through any of the channels below.
-            </p>
-          </div>
+          <ScrollReveal animation="fade-in">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+              <p className="text-lg opacity-90 max-w-2xl mx-auto">
+                Have questions? We're here to help. Reach out to us through any of the channels below.
+              </p>
+            </div>
+          </ScrollReveal>
         </section>
 
         <div className="container mx-auto px-4 py-12">
@@ -101,103 +104,109 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="lg:col-span-1 space-y-6">
               {contactInfo.map((info, i) => (
-                <Card key={i}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <info.icon className="h-5 w-5 text-primary" />
+                <ScrollReveal key={i} animation="slide-in-left" delay={i * 100}>
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <info.icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium mb-2">{info.title}</h3>
+                          {info.details.map((detail, j) => (
+                            <p key={j} className="text-sm text-muted-foreground">{detail}</p>
+                          ))}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-medium mb-2">{info.title}</h3>
-                        {info.details.map((detail, j) => (
-                          <p key={j} className="text-sm text-muted-foreground">{detail}</p>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </ScrollReveal>
               ))}
             </div>
 
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Send us a Message</CardTitle>
-                  <CardDescription>
-                    Fill out the form below and we'll get back to you as soon as possible.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          placeholder="Your name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+              <ScrollReveal animation="fade-up" delay={200}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Send us a Message</CardTitle>
+                    <CardDescription>
+                      Fill out the form below and we'll get back to you as soon as possible.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Full Name *</Label>
+                          <Input
+                            id="name"
+                            placeholder="Your name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          />
+                          {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email Address *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="your.email@example.com"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          />
+                          {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                        </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
+                        <Label htmlFor="subject">Subject *</Label>
                         <Input
-                          id="email"
-                          type="email"
-                          placeholder="your.email@example.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          id="subject"
+                          placeholder="What is this regarding?"
+                          value={formData.subject}
+                          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                         />
-                        {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                        {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subject *</Label>
-                      <Input
-                        id="subject"
-                        placeholder="What is this regarding?"
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      />
-                      {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        placeholder="Please describe your query in detail..."
-                        rows={6}
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      />
-                      {errors.message && <p className="text-sm text-destructive">{errors.message}</p>}
-                    </div>
-                    <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
-                      {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <Send className="h-4 w-4 mr-2" />
-                      )}
-                      Send Message
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                      <div className="space-y-2">
+                        <Label htmlFor="message">Message *</Label>
+                        <Textarea
+                          id="message"
+                          placeholder="Please describe your query in detail..."
+                          rows={6}
+                          value={formData.message}
+                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        />
+                        {errors.message && <p className="text-sm text-destructive">{errors.message}</p>}
+                      </div>
+                      <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
+                        {isLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Send className="h-4 w-4 mr-2" />
+                        )}
+                        Send Message
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
 
               {/* Map Placeholder */}
-              <Card className="mt-8">
-                <CardContent className="p-0">
-                  <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">Map View</p>
-                      <p className="text-sm text-muted-foreground">Education Complex, Sector 15, New Delhi</p>
+              <ScrollReveal animation="fade-up" delay={400}>
+                <Card className="mt-8">
+                  <CardContent className="p-0">
+                    <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <MapPin className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-muted-foreground">Map View</p>
+                        <p className="text-sm text-muted-foreground">Education Complex, Sector 15, New Delhi</p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, AlertCircle, Calendar } from "lucide-react";
+import { Bell, AlertCircle, Calendar, ArrowUpRight } from "lucide-react";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const notices = [
   {
@@ -35,47 +36,66 @@ const notices = [
 
 export const NoticesSection = () => {
   return (
-    <section className="py-12 md:py-16 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Bell className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-foreground">Important Notices</h2>
-            <p className="text-muted-foreground">Stay updated with latest announcements</p>
-          </div>
-        </div>
+    <section className="py-20 md:py-24 bg-background relative">
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-accent/5 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2"></div>
 
-        <div className="grid gap-4">
+      <div className="container mx-auto px-4 relative z-10">
+        <ScrollReveal>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border pb-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                <Bell className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-foreground">Important Notices</h2>
+                <p className="text-muted-foreground mt-1">Stay updated with latest announcements from the university</p>
+              </div>
+            </div>
+            <a href="#" className="text-primary font-medium hover:underline flex items-center gap-2 group">
+              View All Notices
+              <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {notices.map((notice, index) => (
-            <Card 
-              key={notice.id} 
-              className="p-6 shadow-card hover:shadow-card-hover transition-all duration-300 border-l-4 border-l-primary cursor-pointer group animate-in slide-in-from-bottom"
-              style={{ animationDelay: `${index * 100}ms` }}
+            <ScrollReveal
+              key={notice.id}
+              delay={index * 100}
+              viewOffset={0.1}
             >
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-start gap-3 mb-2">
-                    <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge 
-                          variant={notice.type === "important" ? "destructive" : "default"}
-                          className="uppercase text-xs"
-                        >
-                          {notice.type}
-                        </Badge>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {new Date(notice.date).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                          })}
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
+              <Card
+                className="group p-6 cursor-pointer border-l-4 border-l-transparent hover:border-l-primary relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowUpRight className="h-5 w-5 text-primary" />
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className={`mt-1 p-2 rounded-lg ${notice.type === 'important' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                    <AlertCircle className="h-5 w-5" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge
+                        variant={notice.type === "important" ? "destructive" : "secondary"}
+                        className="uppercase text-[10px] tracking-wider"
+                      >
+                        {notice.type}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(notice.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight mb-2">
                         {notice.title}
                       </h3>
                       <p className="text-muted-foreground text-sm leading-relaxed">
@@ -84,8 +104,8 @@ export const NoticesSection = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </ScrollReveal>
           ))}
         </div>
       </div>

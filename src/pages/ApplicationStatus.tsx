@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, Loader2, FileText, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 type Application = Database['public']['Tables']['applications']['Row'];
 
@@ -87,162 +88,169 @@ const ApplicationStatus = () => {
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Check Application Status</h1>
-          <p className="text-muted-foreground mb-8 text-center">
-            Track the status of your admission application
-          </p>
+          <ScrollReveal animation="fade-in">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-foreground mb-2">Check Application Status</h1>
+              <p className="text-muted-foreground mb-8">
+                Track the status of your admission application
+              </p>
+            </div>
+          </ScrollReveal>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Search Application</CardTitle>
-              <CardDescription>Enter your application number or registered email</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSearch} className="flex gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="search" className="sr-only">Application Number or Email</Label>
-                  <Input
-                    id="search"
-                    placeholder="e.g., APP2025000001 or student@email.com"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Search className="h-4 w-4 mr-2" />
-                  )}
-                  Search
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          <ScrollReveal animation="fade-up" delay={200}>
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Search Application</CardTitle>
+                <CardDescription>Enter your application number or registered email</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSearch} className="flex gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="search" className="sr-only">Application Number or Email</Label>
+                    <Input
+                      id="search"
+                      placeholder="e.g., APP2025000001 or student@email.com"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4 mr-2" />
+                    )}
+                    Search
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </ScrollReveal>
 
           {searched && (
-            <>
-              {application ? (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{application.application_number}</CardTitle>
-                        <CardDescription>{application.course_name}</CardDescription>
-                      </div>
-                      <Badge className={statusConfig[application.status].color}>
-                        {statusConfig[application.status].label}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Status Message */}
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
-                      {(() => {
-                        const StatusIcon = statusConfig[application.status].icon;
-                        return <StatusIcon className="h-8 w-8 text-primary" />;
-                      })()}
-                      <div>
-                        <p className="font-medium">{statusConfig[application.status].label}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {statusConfig[application.status].description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Timeline */}
-                    <div>
-                      <h3 className="font-medium mb-4">Application Timeline</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <div className="h-3 w-3 rounded-full bg-primary" />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">Application Created</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(application.created_at).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        {application.submitted_at && (
-                          <div className="flex items-center gap-4">
-                            <div className="h-3 w-3 rounded-full bg-blue-500" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Application Submitted</p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(application.submitted_at).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                        {application.reviewed_at && (
-                          <div className="flex items-center gap-4">
-                            <div className={`h-3 w-3 rounded-full ${
-                              application.status === "approved" ? "bg-green-500" : "bg-red-500"
-                            }`} />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Application Reviewed</p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(application.reviewed_at).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Remarks */}
-                    {application.remarks && (
-                      <div>
-                        <h3 className="font-medium mb-2">Remarks</h3>
-                        <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">
-                          {application.remarks}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Application Details */}
-                    <div>
-                      <h3 className="font-medium mb-2">Application Details</h3>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+            <ScrollReveal animation="scale-in">
+              <>
+                {application ? (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-muted-foreground">Course</p>
-                          <p className="font-medium">{application.course_name}</p>
+                          <CardTitle>{application.application_number}</CardTitle>
+                          <CardDescription>{application.course_name}</CardDescription>
                         </div>
-                        {application.preferred_college && (
-                          <div>
-                            <p className="text-muted-foreground">Preferred College</p>
-                            <p className="font-medium">{application.preferred_college}</p>
-                          </div>
-                        )}
-                        {application.stream && (
-                          <div>
-                            <p className="text-muted-foreground">Stream</p>
-                            <p className="font-medium">{application.stream}</p>
-                          </div>
-                        )}
-                        {application.percentage_12th && (
-                          <div>
-                            <p className="text-muted-foreground">12th Percentage</p>
-                            <p className="font-medium">{application.percentage_12th}%</p>
-                          </div>
-                        )}
+                        <Badge className={statusConfig[application.status].color}>
+                          {statusConfig[application.status].label}
+                        </Badge>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No Application Found</h3>
-                    <p className="text-muted-foreground">
-                      We couldn't find any application with the provided details.
-                      Please check your application number or email and try again.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Status Message */}
+                      <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
+                        {(() => {
+                          const StatusIcon = statusConfig[application.status].icon;
+                          return <StatusIcon className="h-8 w-8 text-primary" />;
+                        })()}
+                        <div>
+                          <p className="font-medium">{statusConfig[application.status].label}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {statusConfig[application.status].description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Timeline */}
+                      <div>
+                        <h3 className="font-medium mb-4">Application Timeline</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <div className="h-3 w-3 rounded-full bg-primary" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Application Created</p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(application.created_at).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          {application.submitted_at && (
+                            <div className="flex items-center gap-4">
+                              <div className="h-3 w-3 rounded-full bg-blue-500" />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Application Submitted</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(application.submitted_at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          {application.reviewed_at && (
+                            <div className="flex items-center gap-4">
+                              <div className={`h-3 w-3 rounded-full ${application.status === "approved" ? "bg-green-500" : "bg-red-500"
+                                }`} />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Application Reviewed</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(application.reviewed_at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Remarks */}
+                      {application.remarks && (
+                        <div>
+                          <h3 className="font-medium mb-2">Remarks</h3>
+                          <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">
+                            {application.remarks}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Application Details */}
+                      <div>
+                        <h3 className="font-medium mb-2">Application Details</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Course</p>
+                            <p className="font-medium">{application.course_name}</p>
+                          </div>
+                          {application.preferred_college && (
+                            <div>
+                              <p className="text-muted-foreground">Preferred College</p>
+                              <p className="font-medium">{application.preferred_college}</p>
+                            </div>
+                          )}
+                          {application.stream && (
+                            <div>
+                              <p className="text-muted-foreground">Stream</p>
+                              <p className="font-medium">{application.stream}</p>
+                            </div>
+                          )}
+                          {application.percentage_12th && (
+                            <div>
+                              <p className="text-muted-foreground">12th Percentage</p>
+                              <p className="font-medium">{application.percentage_12th}%</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No Application Found</h3>
+                      <p className="text-muted-foreground">
+                        We couldn't find any application with the provided details.
+                        Please check your application number or email and try again.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            </ScrollReveal>
           )}
         </div>
       </main>
