@@ -180,13 +180,14 @@
 
 
 import { Button } from "@/components/ui/button";
-import { Menu, User, LogOut, ChevronRight } from "lucide-react";
+import { Menu, User, LogOut, ChevronRight, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { RemoveScroll } from "react-remove-scroll";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -221,16 +222,17 @@ export const Header = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "circOut" }}
       className={cn(
-        "fixed z-50 w-full flex justify-center transition-all duration-300",
-        scrolled || isMenuOpen ? "top-2" : "top-6"
+        "sticky z-50 w-full flex flex-col items-center transition-all duration-300 top-0",
+        scrolled || isMenuOpen ? "lg:top-2" : "lg:top-6"
       )}
     >
       <div
         className={cn(
-          "flex items-center justify-between h-14 px-6 lg:px-8",
-          "bg-background/70 backdrop-blur-xl border border-white/10 shadow-xl",
+          "relative z-50 flex items-center justify-between h-14 px-6 lg:px-8",
+          "bg-background/95 backdrop-blur-xl border border-white/10 shadow-xl",
+          "supports-[backdrop-filter]:bg-background/60",
           "rounded-full max-w-7xl w-[95%] lg:w-auto",
-          "dark:bg-zinc-900/60 dark:shadow-primary/5"
+          "dark:bg-zinc-900/95 dark:shadow-primary/5 supports-[backdrop-filter]:dark:bg-zinc-900/60"
         )}
       >
         {/* Logo */}
@@ -246,7 +248,7 @@ export const Header = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Navbar */}
         <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.href;
@@ -287,7 +289,7 @@ export const Header = () => {
           ) : (
             <Button
               asChild
-              className="rounded-full px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+              className="hidden lg:flex rounded-full px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
             >
               <Link to="/auth">Get Started</Link>
             </Button>
@@ -298,9 +300,11 @@ export const Header = () => {
             size="icon"
             className="lg:hidden rounded-full"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? (
-              <ChevronRight className="h-6 w-6 rotate-90" />
+              <X className="h-6 w-6" />
             ) : (
               <Menu className="h-6 w-6" />
             )}
@@ -311,26 +315,40 @@ export const Header = () => {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden mt-4 w-[95%] max-w-md rounded-2xl bg-background/90 backdrop-blur-2xl border border-white/10 shadow-xl"
-          >
-            <nav className="flex flex-col p-4 gap-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex justify-between items-center p-3 rounded-xl hover:bg-primary/5"
-                >
-                  {link.label}
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              ))}
-            </nav>
-          </motion.div>
+          <RemoveScroll forwardProps>
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-full mt-2 w-[95%] max-w-md rounded-2xl bg-background/95 backdrop-blur-2xl border border-white/10 shadow-2xl overflow-hidden lg:hidden"
+            >
+              <nav className="flex flex-col p-4 gap-2 max-h-[70vh] overflow-y-auto">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex justify-between items-center p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                  >
+                    <span className="text-sm font-medium">{link.label}</span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Link>
+                ))}
+                {!user && (
+                  <div className="pt-2 mt-2 border-t border-border/50">
+                    <Button
+                      asChild
+                      className="w-full rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Link to="/auth">Get Started</Link>
+                    </Button>
+                  </div>
+                )}
+              </nav>
+            </motion.div>
+          </RemoveScroll>
         )}
       </AnimatePresence>
     </motion.header>
